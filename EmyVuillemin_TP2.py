@@ -37,7 +37,6 @@ class MessageBoard(QWidget):#definir la classe | QWidget = affiche dans lecran
 
         button = QPushButton("Organise Outliner")
         layout.addWidget(button)
-
         button.clicked.connect(self.on_click)
         #----------------------------------------------------------------------------------------------------------------------
 
@@ -88,8 +87,45 @@ class MessageBoard(QWidget):#definir la classe | QWidget = affiche dans lecran
             cmds.undoInfo(closeChunk=True)
         #-------------------------------------------------------------------------------------------------------------------------
 
-    def color(self):
+    #sa marche mais sa charge vraiment longtemps, sa peut crash le maya-----------------------------------------------------------
+    def color(self, selection=None):
+
+        
         print("Color")
+
+
+        if selection is None:
+            selection = cmds.ls(selection=True, long=True)
+
+            if not selection:
+                selection = cmds.ls(type="transform", long=True) or []
+
+        for obj in selection:
+
+            name = obj.split("|")[-1]
+
+            for prefix, rgb in self.rules.items():
+
+                if name.startswith(prefix):
+                    try:
+                        if cmds.attributeQuery("useOutlinerColor", node=obj, exists=True):
+                            cmds.setAttr(obj + ".outlinerColor", rgb[0], rgb[1], rgb[2], type="double3")
+                            cmds.setAttr(obj + ".useOutlinerColor", True)
+                            print(f" - Color applied: {obj} -> {prefix}: {rgb}")
+                    except Exception as e:
+                            print(f"Erreur sur {obj}: {e}")
+                    break
+
+    def clear_colors(self):
+
+        selection = cmds.ls(selection=True, long=True) or cmds.ls(type="transform", long=True) or []
+        for obj in selection:
+            try:
+                if cmds.attributeQuery("useOutlinerColor", node=obj, exists=True):
+                    cmds.setAttr(obj + ".useOutlinerColor", False)
+            except:
+                pass
+            print("Couleurs Outliner rénitialisées")
 
     #Pour selectionner-------------------------------------------------------------------------------------------------------------
     def reorder(self, selection):
@@ -99,11 +135,6 @@ class MessageBoard(QWidget):#definir la classe | QWidget = affiche dans lecran
             selection = cmds.ls(transforms=True, long=True)
         #Prendre les cles dans les regles du fichier JSON (Dans la boite, pour prendre les informations)
         keys = list(self.rules.keys())
-
-        #Pour commencer, on prend une collection et on retourne une nouvelle liste triee
-        #Keys sert à determiner l'ordre des elements, calcule la valeur de chaque element et utilise la valeur pour triee
-        #node.split ===> decoupe chaque information alors [-1] prend le dernier element (Dans python liste[-1] ===> est le dernier)
-        #Cherche l'index du premier element de keys qui correspond au debut de la derniere partie de node
 
         sorted_selection = sorted(selection, key=lambda node: next((i for i, p in enumerate(keys) if node.split('|')[-1].startswith(p)), len(keys)))
 

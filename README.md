@@ -14,8 +14,15 @@ Supporter CTRL+Z pour revenir en arrière
 ●
 Utiliser Github pour versionner et stocker le projet.
 
-
 C:\Users\evuillemin\Repos\EmyVuillemin_TP2\rules.json
+
 
  #Pour le long code----------Pour chaque node, prends ce qui se trouve apres le dernier. Cherche dans keys quel prefixe correspond au debut de cette partie
  Utilise la position de ce prefixe dans keys comme valeur de tri. Si aucun prefixe ne correspond, mets le node a la fin. Ensuite, parcours toute la liste triee a l'envers.
+
+
+ #Pour commencer, on prend une collection et on retourne une nouvelle liste triee
+        #Keys sert à determiner l'ordre des elements, calcule la valeur de chaque element et utilise la valeur pour triee
+        #node.split ===> decoupe chaque information alors [-1] prend le dernier element (Dans python liste[-1] ===> est le dernier)
+        #Cherche l'index du premier element de keys qui correspond au debut de la derniere partie de node
+
